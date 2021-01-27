@@ -20,22 +20,24 @@ Types of Webservices:
 	- Make the best use of HTTP
 	- Resource can be send in request by - 1] a part of URI 2] A resource can have different representations - XML, JSON / HTML
 
-Spring Microservices components
-- Config Server
-- Ribbon & Feign
-- Naming server & Eureka
-- API Gateway with ZUUL
-- Distributed tracing with ZipKin
-- Fault tolerance with Hystrix
+### Important Points:
+- Whenever we are saving/creating new entity in application, we need to return proper response status code. 
+**Example**,- in case of creating new entity we have to return HTTP status code 201 (Created) along with URI to access that entity.
 
-
-### Language is base on philosophy:
 ```markdown
-- Beautiful is better than Ugly.
-- Explicit is better than Implicit
-- Simple is better than complex
-- Complex is better than Complicated
-- Increase Readability counts
+	User newUser = this.userService.saveUser(new User("FirstName","LastName","Address"));
+	URI location = ServletUriComponentBuilder.fromCurrentRequest().path("/{userId}").buildAndExpand(newUser.getUserId()).toUri();
+	return ResponseEntity.created(location).build();
+```
+**Example**,- When requested entity/resource on server NOT FOUND, in that case REST api should also send correct HTTP response code along with proper standard response. This is very useful and helpful when there are multiple team from same organization / different organization integrating REST api for given product. We can use ResponseStatus(HttpStatus.NOT_FOUND)
+
+```markdown
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public class UserNotFoundException extends RuntimeException {
+		public UserNotFoundException(String message) {
+			super(message);
+		}
+	}
 ```
 
 <br/><br/>
