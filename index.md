@@ -40,5 +40,39 @@ Types of Webservices:
 	}
 ```
 
+- To avoid sending full stack trace in REST response, following configuration need to change in **application.properties**
+```markdown
+server.error.include_stacktrace = never
+server.error.whitelabel.enabled = false
+``` 
+
+### Exception Hanlding:
+- **ResponseEntityExceptionHandler** If we would like to standardized exception handling response through out organization, we need to override methods of this class.
+
+```markdown
+@ControllerAdvice
+@RestController
+public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+	@ExceptionHandler(Exception.class)
+	public final ResponseEntity<Object> handleAllException(Exception exception, WebRequest request) {
+		ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getLocalizedMessage(), request.getDescription(true));
+		return new ResponseEntity(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+}
+```
+
+- **ControllerAdvice** From Javadocs comments -> Specialization of {@Link Component Component}, for class that declare {@Link ExceptionHandler ExceptionHandler} - *_Exception handling to generate response using ResponseEntity_*, {@Link InitBinder InitBinder} - *_To change response format such as in respoonse we would like to change Date format_* and {@Link ModelAttribute ModelAttribute} - *_common model attribute_* methods to be shared accross multiple classes. 
+
+- **For Handling HTTP 400 (Bad Request) Error** we can override default implementation of *_handleMethodArgumentNotValid(...)_* method. By overriding this method we can add some response body in HTTP 400 error code.
+
+```markdown
+	@Override
+	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
+			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getBindingResult().toString(), request.getDescription(true));
+		return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST);
+	}
+```
+
 <br/><br/>
 [<i class="fa fa-arrow-left"></i> **Back**](/documentation/)
